@@ -50,11 +50,9 @@ usage in Django
     else:
         user_info = request.facebook.graph().get_object("me")
         return render_to_response("welcome.html", user_info, context_instance = RequestContext(request))
-        
-6) a simple sandbox project (with django) is available in the 
+      
 
-
-7) read the code/wait for more documentation. fb.py is one python file with inline documentation, so browsing the code is a good idea than waiting a fully documentation.
+6) read the code/wait for more documentation. fb.py is one python file with inline documentation, so browsing the code is a good idea than waiting a fully documentation.
 
 installation of "example_project"
 =================
