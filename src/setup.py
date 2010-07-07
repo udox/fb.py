@@ -8,6 +8,6 @@ setup(name='fbpy',
       author='Emre Yilmaz',
       author_email='mail@emreyilmaz.me',
       url='http://github.com/emre/fb.py',
-      packages = ['fbpy'],
+      packages = ['fbpy', 'fbpy/tools'],
      )
 
