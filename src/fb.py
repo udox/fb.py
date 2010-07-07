@@ -4,6 +4,10 @@ import urllib
 
 
 class RestApi(object):
+    """
+    Facebook RestApi Backend For the FBPY.
+    documentation for the official methods can be found at: http://developers.facebook.com/docs/reference/rest/
+    """
 
     def __init__(self, token):
         self.auth_token = token
@@ -61,13 +65,28 @@ class GraphApi(object):
         f = urllib.urlopen("https://graph.facebook.com/%s" % request_path, post_data)
         return f.read()
     
-    def put_wall_post(self, request_post, post_data):
+    def put_wall_post(self, user_alias, post_data):
         """
-        creates a wall post for the running user
+        helper/shortcut function for wall postings
+        @params:
+            - user alias (profile id or username)
+            - post_data (dictionary)
+                - example = {
+                    "message": "foo bar",
+                    "picture": "https://github.com/images/modules/header/logov3.png",
+                    "link"   : "http://www.github.com/emre/",
+                    "name"   : "github logo",
+                    "description": "buraya bakarlar description alani"
+                }
+        * if you want to post your running user, just send user_alias parameter as "me".
         """
-        pass
+        return self._put_request("%s/feed" % user_alias, post_data)
+        
 
 class FBPY(object):
+    """
+    base FBPY object
+    """
 
     def __init__(self, token):
         self.auth_token = token
