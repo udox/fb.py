@@ -7,7 +7,7 @@ setup(name='fbpy',
       description='python sdk for facebook apis',
       author='Emre Yilmaz',
       author_email='mail@emreyilmaz.me',
-      url='http://www.python.org/sigs/distutils-sig/',
+      url='http://github.com/emre/fb.py',
       packages = ['fbpy'],
      )
 
