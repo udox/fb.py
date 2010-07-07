@@ -95,19 +95,46 @@ class GraphApi(object):
     handles api-response errors
     """
     def _handle_errors(self, api_response):
-        if api_response["error"]:
+        if isinstance(api_response, dict) and api_response.has_key("error"):
             raise GraphApiException(api_response["error"]["type"], api_response["error"]["message"])
     
-    def _get_request(self, request_path):
+    def _get_request(self, request_path, extra_params = None):
         """
         makes a HTTP (GET) request to the facebook graph api servers for given parameters. 
         (just for the information getter methods.)
         """
-        f = urllib.urlopen("https://graph.facebook.com/%s?access_token=%s" % (request_path, self.auth_token))
+        parameters = {
+            "access_token" : self.auth_token,
+        }
+        
+        if extra_params:
+            parameters.update(extra_params)
+        
+        f = urllib.urlopen("https://graph.facebook.com/%s?%s" % (request_path, urllib.urlencode(parameters)))
+
         api_response = simplejson.loads(f.read())
         self._handle_errors(api_response)
         
         return api_response
+        
+
+    def get_picture(self, user_alias, picture_size = None):
+        """
+        shortcut method to retrieve user avatars easily by selected size.
+        possible types: small, square, large.
+        example:
+            - fbpy_instance.graph().get_picture(USER_ID, "small")
+        """
+        extra_params = {}
+        if user_alias == 'me':
+            result = self.get_object("me")
+            user_alias = result["id"]
+        if picture_size and picture_size in ["small", "square", "large"]:
+            extra_params.update({
+                "type": picture_size,
+            })
+
+        return "https://graph.facebook.com/%s/picture?%s" % (user_alias, urllib.urlencode(extra_params))
     
     def _put_request(self, request_path, post_data):
         """
@@ -206,5 +233,4 @@ class FBPY(object):
         return "https://www.facebook.com/logout.php?%s" % urllib.urlencode(params)
 
     
-
 
