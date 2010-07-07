@@ -10,6 +10,10 @@ class FBPYMiddleware(object):
     
     def process_request(self, request):
         request.facebook = FBPY()
+        request.facebook.set_config(settings.FACEBOOK_CONFIG)
+        if request.session.has_key("fb_user"):
+		if request.session["fb_user"].has_key("access_token"):
+			request.facebook.set_token(request.session["fb_user"]["access_token"])
         """
         if this request is login
         """
@@ -18,9 +22,8 @@ class FBPYMiddleware(object):
                 fb_user = simplejson.loads(request.GET["session"])
                 request.session["fb_user"] = fb_user
                 request.facebook.set_token(fb_user["access_token"])
-                request.facebook.set_config(settings.FACEBOOK_CONFIG)
-            except:
-                pass
+            except Exception, error:
+                print error
 
     def process_response(self, request, response):
         response['P3P'] = 'CP="NOI DSP COR NID ADMa OPTa OUR NOR"'
