@@ -173,12 +173,38 @@ class FBPY(object):
     base FBPY object
     """
 
+    """
+    config dict for usual operations
+    """
+    CONFIG = {
+        "login_next_url"   : None,
+        "login_cancel_url" : None,
+        "login_req_perms"  : None,
+        "logout_next_url"  : None,
+        "api_key"          : None,
+    }
+    
     def __init__(self, token = None):
         self.auth_token = token
         self.graph_api_instance = None
         self.rest_api_instance  = None
-    
+
+    def set_config(self, config):
+        """
+        setter for FBPY config attribute.        
+        """
+        FBPY.CONFIG.update(config)
+
+    def get_config(self):
+        """
+        getter for FBPY config attribute.        
+        """
+        return FBPY.CONFIG
+
     def set_token(self, token):
+        """
+        setter for FBPY oauth token.    
+        """
         self.auth_token = token
     
     def is_authenticated(self):
@@ -203,34 +229,51 @@ class FBPY(object):
         return self.rest_api_instance
 
     @staticmethod
-    def get_login_url(params):
+    def get_login_url(params = {}):
         """
         gets the login url to the your facebook application
         @params:
-            - api_key
-            - cancel_url
-            - next
-            - req_perms
+            - api_key (if exists in FBPY.CONFIG, not required)
+            - cancel_url (if exists in FBPY.CONFIG, not required)
+            - next (if exists in FBPY.CONFIG, not required)
+            - req_perms (if exists in FBPY.CONFIG, not required)
         """
         query_string = {
             "return_session"  : 1,
             "session_version" : 3,
             "v"               : '1.0'
         }
+        
+        # load default config
+        query_string.update({
+            "api_key"    : FBPY.CONFIG.get("api_key"),
+            "cancel_url" : FBPY.CONFIG.get("login_cancel_url"),
+            "next"       : FBPY.CONFIG.get("login_next_url"),
+            "req_perms"  : FBPY.CONFIG.get("login_req_perms"),
+        })
+        
         query_string.update(params)
         return "https://www.facebook.com/login.php?%s" % urllib.urlencode(query_string)
-    
 
     @staticmethod
     def get_logout_url(params):
         """
         gets the logout url:
         @params:
-            - api_key
-            - next
-            - session_key
+            - api_key (if exists in FBPY.CONFIG, not required)
+            - next (if exists in FBPY.CONFIG, not required)
+            - session_key (required)
         """
-        return "https://www.facebook.com/logout.php?%s" % urllib.urlencode(params)
+        default_params = {
+            "api_key": FBPY.CONFIG.get("api_key"),
+            "next": FBPY.CONFIG.get("logout_next_url"),
+        }
+        
+        if not params.has_key("session_key"):
+            raise Exception("session_key is required for get_logout_url method.")
+            
+        default_params.update(params)
+        return "https://www.facebook.com/logout.php?%s" % urllib.urlencode(default_params)
 
     
 
