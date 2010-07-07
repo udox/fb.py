@@ -2,7 +2,6 @@
 
 import urllib
 
-
 class RestApi(object):
     """
     Facebook RestApi Backend For the FBPY.
@@ -12,14 +11,26 @@ class RestApi(object):
     def __init__(self, token):
         self.auth_token = token
         
-    def get_object(self):
-        pass
-    
-    def put_object(self):
-        pass
-        
-    def _get_request(self):
-        pass
+    def get_object(self, call_method, **kargs):
+        """
+        @params:
+            - call_method : method for the rest api.
+            (http://developers.facebook.com/docs/reference/rest/)
+            - 
+        """
+        return self._get_request(call_method, **kargs)
+
+    def _get_request(self, call_method, **kargs):
+        """
+        makes a HTTP (GET) request to the facebook rest api servers for given parameters. 
+        """
+        query_string = {
+            "access_token": self.auth_token,
+            "format": "json"
+        }
+        query_string.update(kargs)
+        f = urllib.urlopen("https://api.facebook.com/method/%s?%s" % (call_method, urllib.urlencode(query_string)) )
+        return f.read()
  
     def _put_request(self):
         pass
@@ -47,7 +58,7 @@ class GraphApi(object):
 
     def _get_request(self, request_path):
         """
-        makes a HTTP (GET) request to the facebook api servers for given parameters. 
+        makes a HTTP (GET) request to the facebook graph api servers for given parameters. 
         (just for the information getter methods.)
         """
         f = urllib.urlopen("https://graph.facebook.com/%s?access_token=%s" % (request_path, self.auth_token))
@@ -55,7 +66,7 @@ class GraphApi(object):
     
     def _put_request(self, request_path, post_data):
         """
-        makes a HTTP (POST) request to the facebook api servers for given parameters. 
+        makes a HTTP (POST) request to the facebook graph api servers for given parameters. 
         (just for the information setter methods.)
         """
         post_data.update({
@@ -78,7 +89,7 @@ class GraphApi(object):
                     "name"   : "github logo",
                     "description": "buraya bakarlar description alani"
                 }
-        * if you want to post your running user, just send user_alias parameter as "me".
+        * if you want to post to your running user's wall, just send user_alias parameter as "me".
         """
         return self._put_request("%s/feed" % user_alias, post_data)
         
@@ -101,6 +112,15 @@ class FBPY(object):
             self.graph_api_instance = GraphApi(self.auth_token)
 
         return self.graph_api_instance
+    
+    def rest(self):
+        """
+        returns rest api interface
+        """
+        if not self.rest_api_instance:
+            self.rest_api_instance = RestApi(self.auth_token)
+
+        return self.rest_api_instance
 
     @staticmethod
     def get_login_url(params):
