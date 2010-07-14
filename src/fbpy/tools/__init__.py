@@ -3,7 +3,6 @@
 import simplejson
 
 from fbpy import FBPY
-
 from django.conf import settings
 
 class FBPYMiddleware(object):
@@ -14,8 +13,9 @@ class FBPYMiddleware(object):
         if request.session.has_key("fb_user"):
 		if request.session["fb_user"].has_key("access_token"):
 			request.facebook.set_token(request.session["fb_user"]["access_token"])
+			request.facebook.set_uid(request.session["fb_user"]["uid"])
         """
-        if this request is login
+        if facebook returned back the user session, register it.
         """
         if request.GET.has_key("session"):
             try:
@@ -23,8 +23,10 @@ class FBPYMiddleware(object):
                 request.session["fb_user"] = fb_user
                 request.facebook.set_token(fb_user["access_token"])
             except Exception, error:
-                print error
+		pass
 
+    
     def process_response(self, request, response):
         response['P3P'] = 'CP="NOI DSP COR NID ADMa OPTa OUR NOR"'
-        return response
+        return response 
+    

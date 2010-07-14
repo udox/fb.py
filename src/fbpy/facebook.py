@@ -1,6 +1,5 @@
 # -*- coding: utf8 -*-
 
-
 import urllib, simplejson
 
 """
@@ -12,6 +11,27 @@ you can find official documentation at facebook:
     * graph api: http://graph.facebook.com
 
 for the installation tips and usage examples, take a look to the readme.
+
+Copyright (c) 2010 emre yilmaz - egnity 
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+
 """
 
 class GraphApiException(Exception):
@@ -43,7 +63,7 @@ class RestApi(object):
     handles api-response errors
     """
     def _handle_errors(self, api_response):
-        if isinstance(api_response, dict) and api_response["error_code"]:
+        if isinstance(api_response, dict) and api_response.has_key("error_code"):
             raise RestApiException(api_response["error_code"], api_response["error_msg"])
         
     def get_object(self, call_method, **kargs):
@@ -83,8 +103,8 @@ class GraphApi(object):
     """
     gets the given object from facebook api.
     """
-    def get_object(self, request_path):
-        return self._get_request(request_path)
+    def get_object(self, request_path, extra_params = None):
+        return self._get_request(request_path, extra_params)
         
     """
     puts the given object to the facebook api_key.
@@ -110,7 +130,7 @@ class GraphApi(object):
         
         if extra_params:
             parameters.update(extra_params)
-        
+
         f = urllib.urlopen("https://graph.facebook.com/%s?%s" % (request_path, urllib.urlencode(parameters)))
 
         api_response = simplejson.loads(f.read())
@@ -145,6 +165,11 @@ class GraphApi(object):
         post_data.update({
             "access_token": self.auth_token,
         })
+
+	if post_data:
+		for key, value in post_data.iteritems():
+			if isinstance(value, unicode):
+				post_data[key] = value.encode("utf8") 
         post_data = urllib.urlencode(post_data)
         f = urllib.urlopen("https://graph.facebook.com/%s" % request_path, post_data)
         api_response = simplejson.loads(f.read())
@@ -189,6 +214,7 @@ class FBPY(object):
         self.auth_token = token
         self.graph_api_instance = None
         self.rest_api_instance  = None
+	self.user_id		= 0
 
     def set_config(self, config):
         """
@@ -207,6 +233,15 @@ class FBPY(object):
         setter for FBPY oauth token.    
         """
         self.auth_token = token
+
+    def set_uid(self, uid):
+        """
+        setter for autenticated user id on facebook.    
+        """
+        self.user_id = uid
+
+    def get_uid(self):
+	return self.user_id
     
     def is_authenticated(self):
         return bool(self.auth_token)
