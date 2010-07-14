@@ -166,9 +166,9 @@ class GraphApi(object):
             "access_token": self.auth_token,
         })
 
-		if post_data:
-			for key, value in post_data.iteritems():
-				if isinstance(value, unicode): post_data[key] = value.encode("utf8") 
+        if post_data:
+            for key, value in post_data.iteritems():
+                if isinstance(value, unicode): post_data[key] = value.encode("utf8") 
         post_data = urllib.urlencode(post_data)
         f = urllib.urlopen("https://graph.facebook.com/%s" % request_path, post_data)
         api_response = simplejson.loads(f.read())
