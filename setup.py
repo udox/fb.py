@@ -7,7 +7,7 @@ setup(name='fbpy',
       description='python sdk for facebook apis',
       author='Emre Yilmaz',
       author_email='mail@emreyilmaz.me',
-      url='http://github.com/emre/fb.py',
-      packages = ['src/fbpy', 'src/fbpy/tools'],
+      url='http://github.com/egnity/fb.py',
+      package_dir={'': 'src'},
      )
 
