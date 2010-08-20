@@ -28,4 +28,13 @@ class FBPYMiddleware(object):
     def process_response(self, request, response):
         response['P3P'] = 'CP="NOI DSP COR NID ADMa OPTa OUR NOR"'
         return response 
-    
+
+"""
+login_required decorator for views.
+"""
+def require_facebook_login(function):
+    def wrap(request, *args, **kwargs):
+        if request.facebook.is_authenticated() == False:
+            return HttpResponseRedirect(request.facebook.get_login_url())
+        return function(request, *args, **kwargs)
+    return wrap
