@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='fbpy',
       version='1.0',
@@ -8,6 +8,7 @@ setup(name='fbpy',
       author='Emre Yilmaz',
       author_email='mail@emreyilmaz.me',
       url='http://github.com/egnity/fb.py',
-      package_dir={'': 'src'},
-     )
+    package_dir={'': 'src'},
+    packages = ["fbpy", "fbpy/tools",]
+)
 
