@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-import urllib, simplejson
+import urllib, simplejson, urllib2, MultipartPostHandler, cookielib
 
 """
 fb.py is a python client library for facebook api. it supports both *old rest api*
@@ -157,7 +157,7 @@ class GraphApi(object):
 
         return "https://graph.facebook.com/%s/picture?%s" % (user_alias, urllib.urlencode(extra_params))
     
-    def _put_request(self, request_path, post_data):
+    def _put_request(self, request_path, post_data, filename=None, filefield='source'):
         """
         makes a HTTP (POST) request to the facebook graph api servers for given parameters. 
         (just for the information setter methods.)
@@ -168,9 +168,17 @@ class GraphApi(object):
 
         if post_data:
             for key, value in post_data.iteritems():
-                if isinstance(value, unicode): post_data[key] = value.encode("utf8") 
-        post_data = urllib.urlencode(post_data)
-        f = urllib.urlopen("https://graph.facebook.com/%s" % request_path, post_data)
+                if isinstance(value, unicode): post_data[key] = value.encode("utf8")
+        
+        if filename:
+            cookies = cookielib.CookieJar()
+            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookies),
+                                          MultipartPostHandler.MultipartPostHandler)
+            post_data[filefield] = open(filename)
+            f = opener.open("https://graph.facebook.com/%s" % request_path, post_data)
+        else:
+            post_data = urllib.urlencode(post_data)
+            f = urllib.urlopen("https://graph.facebook.com/%s" % request_path, post_data)
         api_response = simplejson.loads(f.read())
         self._handle_errors(api_response)
         
