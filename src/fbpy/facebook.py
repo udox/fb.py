@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 
 import urllib, simplejson, urllib2, cookielib
-from tools.http import MultipartPostHandler
+from helpers import MultipartPostHandler
 
 """
 fb.py is a python client library for facebook api. it supports both *old rest api*
