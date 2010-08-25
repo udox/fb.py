@@ -42,7 +42,7 @@ class GraphApiException(Exception):
     def __init__(self, type, message):
         Exception.__init__(self, message)
         self.type = type
-        
+    
 class RestApiException(Exception):
     """
     custom exception class for rest api response errors.
@@ -59,14 +59,14 @@ class RestApi(object):
 
     def __init__(self, token):
         self.auth_token = token
-        
+    
     """
     handles api-response errors
     """
     def _handle_errors(self, api_response):
         if isinstance(api_response, dict) and api_response.has_key("error_code"):
             raise RestApiException(api_response["error_code"], api_response["error_msg"])
-        
+    
     def get_object(self, call_method, **kargs):
         """
         @params:
@@ -91,7 +91,7 @@ class RestApi(object):
         
         return api_response
 
-           
+
 class GraphApi(object):
     """
     Facebook GraphApi Backend For the FBPY. 
@@ -106,13 +106,13 @@ class GraphApi(object):
     """
     def get_object(self, request_path, extra_params = None):
         return self._get_request(request_path, extra_params)
-        
+    
     """
     puts the given object to the facebook api_key.
     """
     def put_object(self, request_path, post_data):
         return self._put_request(request_path, post_data)
-        
+    
     """
     handles api-response errors
     """
@@ -131,14 +131,14 @@ class GraphApi(object):
         
         if extra_params:
             parameters.update(extra_params)
-
+        
         f = urllib.urlopen("https://graph.facebook.com/%s?%s" % (request_path, urllib.urlencode(parameters)))
-
+        
         api_response = simplejson.loads(f.read())
         self._handle_errors(api_response)
         
         return api_response
-        
+
 
     def get_picture(self, user_alias, picture_size = None):
         """
@@ -155,7 +155,7 @@ class GraphApi(object):
             extra_params.update({
                 "type": picture_size,
             })
-
+        
         return "https://graph.facebook.com/%s/picture?%s" % (user_alias, urllib.urlencode(extra_params))
     
     def _put_request(self, request_path, post_data, filename=None, filefield='source'):
@@ -166,7 +166,7 @@ class GraphApi(object):
         post_data.update({
             "access_token": self.auth_token,
         })
-
+        
         if post_data:
             for key, value in post_data.iteritems():
                 if isinstance(value, unicode): post_data[key] = value.encode("utf8")
@@ -222,7 +222,7 @@ class FBPY(object):
         self.auth_token = token
         self.graph_api_instance = None
         self.rest_api_instance  = None
-	self.user_id		= 0
+        self.user_id = 0
 
     def set_config(self, config):
         """
@@ -249,18 +249,18 @@ class FBPY(object):
         self.user_id = uid
 
     def get_uid(self):
-	return self.user_id
+        return self.user_id
     
     def is_authenticated(self):
         return bool(self.auth_token)
-        
+    
     def graph(self):
         """
         returns graph api interface
         """
         if not self.graph_api_instance:
             self.graph_api_instance = GraphApi(self.auth_token)
-
+        
         return self.graph_api_instance
     
     def rest(self):
@@ -269,7 +269,7 @@ class FBPY(object):
         """
         if not self.rest_api_instance:
             self.rest_api_instance = RestApi(self.auth_token)
-
+        
         return self.rest_api_instance
 
     @staticmethod
@@ -320,4 +320,3 @@ class FBPY(object):
         return "https://www.facebook.com/logout.php?%s" % urllib.urlencode(default_params)
 
     
-
