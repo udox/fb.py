@@ -110,8 +110,8 @@ class GraphApi(object):
     """
     puts the given object to the facebook api_key.
     """
-    def put_object(self, request_path, post_data):
-        return self._put_request(request_path, post_data)
+    def put_object(self, request_path, post_data, filename=None, filefield='source'):
+        return self._put_request(request_path, post_data, filename, filefield)
     
     """
     handles api-response errors
